@@ -6,9 +6,14 @@ sidebar_position: 2
 
 ## Public Access
 Access to the service without any need to identify or authorize the requester. This will only return generic
-information at the GTIN (Global Trade Item Number) level of the product (Stock Keeping Unit level). All
-requesters will receive the same message structure from all participating members, based on / utilizing a
-defined subset of Standardized Fields (Core Set of Data).
+information at the GTIN (Global Trade Item Number) level of the product (Stock Keeping Unit level). 
+Allrequesters will receive the same message structure from all participating members (only 3 fields are considered mandatory in the answer and have to be provived by each tire manufacturer, because they are applicable whatever type of tires).
+
+:::caution
+
+With public access, there is `no Service Level Agreement` defined with tire manufactures. Take care if you imagine build a service using only this type of access.
+
+:::
 
 ## Private Access (Authenticated Access)
 Access to the service upon identification and authentication of the requester. This will return information
