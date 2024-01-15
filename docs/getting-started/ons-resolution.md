@@ -4,35 +4,52 @@ sidebar_position: 2
 
 # 1. ONS resolution
 
-GDSO’s Tire Information Service (TIS) does not own data from all RFID tires of every tire maker. Its role is to
-guide the user to the appropriate Tire manufacturer’s service. It is this service, belonging to each maker,
-that will provide the data under a standardized format that is shared with the others.
+GDSO’s Tire Information Service (TIS) does not own data from all RFID tires of every tire manufacturer. Its role is to
+guide the user to the appropriate Tire manufacturer’s service. It is this service, belonging to each manufacturer,
+that will provide the data followwing a standardized format that is shared with the others.
+
 Therefore, the ONS resolution step is here to deliver the right API URL that a user would be able to call to
 get the data about his tire.
+
 To identify the company that made the tire that was scanned, it uses what is called a ‘company prefix’ which
-is encoded in RFID identifiers. Based on this information, the TIS will know which company’s API has to be
+is encoded in UII . Based on this information, the TIS will know which company’s API has to be
 called. The actions required to extract the company prefix and use the Resolution service are described
 below.
+
 ## 1.1 Obtain a GS1 Identification Key from UII
 
 1. Capture a valid EPC/UII by scanning a tire for example. A valid UII shall follow ISO 20909/20910
-standards. According to these ISO standards, this identifier should be SGTIN-96 format (96 bits of data).
-Example of SGTIN-96 (hexadecimal) captured by a system: 301854AAC1493D023119400A
-Depending on the capture system level, EPC could be written in different ways: Raw (hexadecimal), Tag
-URI, Pure Identity URI.
+standards. According to these ISO standards, this identifier should be |SGTIN-96 format (96 bits of| data).| 
 
-2. According to ONS 2.01 standard in order to query the DNS for an UII, the identifier form must be
-converted to a GS1 Identification Key in order to convert it for ONS resolution.
+*Ex|ample of |SGTIN-96 |(hexadecimal) captured by a system:*||
+**301854AAC1 3D023|119400A** |
+| | Depe|ndi |ng on the ca| ptur|e system level, EPC could be written in different ways: Raw (hexadecimal)|, Tag| |
+||URI||, || re Identity URI.|
+||| ||| A||ccordin |g to the pre| vious example, here the different EPC fo|rmat : |
+|||||||||
+|||||||||||| || |
+||||||||||||| --- | --- |
+|||||||||||||**RAW (Hexadecimal)**  |301854AAC1493D023119400A  	                        |
+|||||||||||||**Tag URI**           |urn:epc:tag:sgtin-96:0.086699.0337140.9413672970    	    |
+||||||*|*Pure Identity URI**  |urn:epc:id:sgtin:086699.0337140.9413672970 	    ||
+|||||
+|1|. |According to ONS 2.01 standard in order to query the DNS for an UII, the identifier must be converted to a GS1 Identification Key in order to convert it for ONS resolution.
 In TIS context, GS1 Identification Key needed is GTIN (Global Trade Item Number).
 
 ![GS1Key translation](/img/gs1_key_translation.png)
 
+:::tip
 How to know the size of Company Prefix/ Indicator digit & item reference column?
-Please refer to the partition value and the following table.
-At this stage, the GS1 Identification Key obtained is a GTIN: 008669903371400 .
+
+Please refer to the partition value and the following table:
+![SGTIN Partition Table](/img/sgtin_partition_table.png)
+:::
+
+At this stage, the **GS1 Identification Key** obtained is a GTIN: ```008669903371400```.
+
 It exists some libraries/tools to perform the conversion:
-[S1 EPC encoding/decoding tools](https://www.gs1.org/services/epc-encoderdecoder)
-[EPCtagCoder by jlcout](https://github.com/jlcout/epctagcoder)
+- [S1 EPC encoding/decoding tools](https://www.gs1.org/services/epc-encoderdecoder)
+- [EPCtagCoder by jlcout](https://github.com/jlcout/epctagcoder)
 
 ## 1.2. Transform GS1 Identification Key to a valid key for ONS (Fully Qualified Domain Name)
 
@@ -75,7 +92,8 @@ Append a valid ONS root domain name, in TIS case: “testing.gdso.org “
 ```
 
 Root domain may be different depending on the environment you would like to use: Testing environment or
-Production environment (See Annex 1 for the root domains).
+Production environment (See [TIS Environnment](tis-env.md) for the root domains).
+
 ## 1.3. Request the ONS to find the URL endpoint
 
 1. Once you have the URL to request (result of step 1.2) you will have to launch a DNS NAPTR request to
@@ -100,9 +118,6 @@ manufacturer’s API
 https://dns.google/resolve?name=0.0.4.1.7.3.3.9.9.6.6.8.0.gtin.gs1.id.testing.gdso.org&type=NAPTR
 Answer:
 
-#### Example 2 (using ‘dig’ command):
-Answer:
-
 ```jsx
 {
 "Status": 0,
@@ -122,31 +137,43 @@ Answer:
 "name": "0.0.4.1.7.3.3.9.9.6.6.8.0.gtin.gs1.id.testing.gdso.org.",
 "type": 35,
 "TTL": 60,
-"data": "0 0 u GetTireBySgtin !^.*$!https://indus.api.michelin.com/tid-ultimv1/
-etrto/! ."
+"data": "0 0 u GetTireBySgtin !^.*$!https://indus.api.michelin.com/tid-ultimv1/gdso/! ."
 }
 ],
 "Comment": "Response from 2600:9000:5304:7000::1."
 }
 ```
 
+#### Example 2 (using ‘dig’ command):
+
 ```jsx
 dig -t NAPTR 0.0.4.1.7.3.3.9.9.6.6.8.0.gtin.gs1.id.testing.gdso.org
 ```
 
+Answer:
 ![Resolver answer](/img/example_resolver_answer.png)
 
 The resolution may sometimes return more than 1 service (unlike the example above).
 
 1. Then you may select the appropriate service that you will use to request data from the tire’s
 manufacturer in the following steps. The service to retrieve standard data on a tire MUST be named
-GetTireBySgtin
+**GetTireBySgtin**
 
 1. Retrieve the regexp associated to the chosen service name:
-Example: !^.*$! https://indus.api.michelingroup.com/gateway/ultim/1.0/etrto/!
+
+Example: 
+```jsx
+!^.*$! https://indus.api.michelin.com/tid-ultimv1/gdso/!
+```
 
 1. Extract the API URL from it
-Example: https://indus.api.michelingroup.com/gateway/ultim/1.0/etrto/
+
+Example: 
+
+```jsx
+https://indus.api.michelin.com/tid-ultimv1/gdso/
+```
+
 It exists some libraries/tools available to request TIS Resolver:
-[Google DNS resolve (using HTTP request)](https://dns.google/resolve?name=%3Cvalid_key%3E&type=NAPTR)
-[Java library with NAPTR request implementation](https://github.com/dnsjava/dnsjava)
+- [Google DNS resolve (using HTTP request)](https://dns.google/resolve?name=%3Cvalid_key%3E&type=NAPTR)
+- [Java library with NAPTR request implementation](https://github.com/dnsjava/dnsjava)
