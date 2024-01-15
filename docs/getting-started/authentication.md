@@ -21,14 +21,17 @@ GDSO authentication system will provide to its authorized users an identificatio
 to any manufacturer’s API. Having such a token will become mandatory for any customer who would like to
 get additional private data through the TIS.
 The process to authenticate and obtain an Id token is described in the steps below.
+
 ## 2.1. Prerequisite
 In order to execute this step, you will need a user declared by GDSO at the TIS level. It means you have to
 request an access to GDSO organization which will provide you a username and password, once your
-demand is processed.
-Such a request can be made by sending an email to info@gdso.org providing a username and their
-associated email address.
-## 2.2. Get an identification token
+demand is processed
 
+:::info
+Link to [User registration process](https://gdso.org/Members-description/Technical-documentation#:~:text=TIS%20User%20registration%20process)
+:::
+
+## 2.2. Get an identification token
 
 ### 2.2.1. Solution 1: Use Open Id connect
 Open Id Connect (OIDC) is a standard based on Oauth2. You may find official documentation on:
@@ -36,28 +39,37 @@ Open Id Connect (OIDC) is a standard based on Oauth2. You may find official docu
 * https://openid.net/connect/
 
 OpenId standard provides different solutions for users to identify themselves toward another system. The
-two following flows are recommended for browser-based identification. They also require to have a client Id
-and client Secret declared on the authentication server’s side. ** If you need to obtain them, you may
-address a request by mail to info@gdso.org.**
+two following flows are recommended for browser-based identification. 
 
-```jsx
-POST https://authentication-api.testing.gdso.org/getIdToken
-```
+:::tip
+If you need some client credentials : ```client ID``` and/or ```client secret``` (depending on the OpenID method implemented), you may
+address a request by mail to **info@gdso.org**.
+:::
 
 #### 2.2.1.1 Open Id – Implicit flow
+:::note
 Note: The implicit flow method is possible in a browser environment. Although it is easier to implement
 than the ‘Authorization code flow’ (presented in the next part), it also carries more security risks. That is why
 it only delivers a temporary access token and no refresh token.
-Process: To receive an identification token, the application (client) or user will have to make an
-authentication request to the Amazon Cognito server used by the TIS. This request requires:
+:::
 
+:::info
+**Process:** To receive an identification token, the application (client) or user will have to make an
+authentication request to the Amazon Cognito server used by the TIS. 
+:::
+
+This request requires:
 * Username and password (obtained in step 2.1)
-* Client Id (see Annex 1 for example and Introduction if you need to request a client)
+* Client Id (see [Tip](/docs/getting-started/authentication#221-solution-1-use-open-id-connect) in 2.2.1 if you need to request a client ID)
 * A callback URL for your application
   
 Example:
 1. First you can make an authentication request to the following URL (see Annex 1 for Cognito URL on all
 environments). It will redirect to the Tire Information Service login page.
+
+```jsx
+GET https://fuqzxw2k75c49t2fdn.auth.eu-central-1.amazoncognito.com/authorize?response_type=token&state=anything&client_id=3661gkmsqil29qtb24rvq3o4tb&scope=openid&redirect_uri=https://www.postman.com/oauth2/callback
+```
 
 ![Auth request](/img/example_authentication_request.png)
 
@@ -67,23 +79,21 @@ Parameters:
 * In yellow --> Client Id (see Annex 1)
 * In Blue --> Your callback URL
 
+This request shall be made with your credentials in the body:
+![Auth body](/img/example_authorize_body_postman.png)
+
 You will receive a redirection toward the login service in the response’s header (in red below):
 
 ![Redirection login service](/img/example_redirection_login_service.png)
 
-2. Then you can request the redirection URL in a browser, that will lead you to Sign in page:
-```jsx
-GET https://fuqzxw2k75c49t2fdn.auth.eu-central-1.amazoncognito.com/login?
-response_type=token&state=anything&client_id=3661gkmsqil29qtb24rvq3o4tb&scope=openi
-d&redirect_uri=https%3A%2F%2Fwww.myapplication.com%2Foauth2%2Fcallback
-```
+In the answer body, you have to get also the "_csrf" value :
+![Obtain _csrf value](/img/example_authorize_answer_csrf.png)
 
-![Redirection login service](/img/example_login_form.png)
-
-1. Validating the credentials will trigger a login request and send back an Id Token and an Access Token to
+2. Validating the credentials will trigger a login request and send back an Id Token and an Access Token to
 your callback URL.
 ClientId is in the request’s header, credentials are in the request’s body. (Note that in theory, the two
 previous steps aim at leading you to this request).
+
 ```jsx
 POST https://fuqzxw2k75c49t2fdn.auth.eu-central-1.amazoncognito.com/login?
 response_type=token&state=anything&client_id=3661gkmsqil29qtb24rvq3o4tb&scope=openid&re
@@ -92,22 +102,36 @@ direct_uri=https%3A%2F%2Fwww.myapplication.com%2Foauth2%2Fcallback
 Body:
 - username: "myLogin"
 - password: "********"
+- _csrf : d979ce83-cbc1-49cf-955-418de10caf72
 ```
 
+![Auth request](/img/example_login_body.png)
+
+3. Get your tokens 
+   
+You will receive your ```id_token``` and ```access_token``` in the response’s header (in red below):
 
 ![Redirection login service](/img/example_post_login.png)
 
 #### 2.2.1.2 Open Id – Authorization Code Flow
+:::note
 Note: Here is another standard process that leads to receiving an Id Token. Like the Implicit Flow presented
 above, it is also available in a browser environment. When possible, it is the recommended process to
 implement. It is more secure than the ‘Implicit flow’ and provides a refresh token to be used when the given
 token expires. However, unlike the previous method, it will require the use of a client secret.
+:::
+
+:::info
 Process: To receive an identification token, the application (client) or user will have to make an
-authentication request to the Amazon Cognito server used by the TIS. This request requires:
-Username and password (obtained in step 2.1)
-Client Id (see Annex 1 for example and Introduction if you need to request a client)
-Client Secret (see Introduction if you need to request a client)
-A callback URL for your application
+authentication request to the Amazon Cognito server used by the TIS. 
+:::
+
+This request requires:
+* Username and password (obtained in step 2.1)
+* Client Id (see [Tip](/docs/getting-started/authentication#221-solution-1-use-open-id-connect) in 2.2.1 if you need to request a client ID)
+* Client Secret (see [Tip](/docs/getting-started/authentication#221-solution-1-use-open-id-connect) in 2.2.1 if you need to request a client secret)
+* A callback URL for your application
+  
 Example:
 1. First you will have to submit an authentication request with a ‘code’ response type
 Parameters:
@@ -117,7 +141,7 @@ Response Type: response_type=code
 Application Client Id (see Annex 1): 3661gkmsqil29qtb24rvq3o4tb
 Your callback URL: https://www.myapplication.com/oauth2/callback
 
-3. You will receive a redirection to the login page where you may enter your user’s credentials:
+1. You will receive a redirection to the login page where you may enter your user’s credentials:
 ```jsx
 GET https://fuqzxw2k75c49t2fdn.auth.eu-central-
 1.amazoncognito.com/oauth2/authorize?
@@ -203,9 +227,25 @@ An API endpoint is available to request an Identification token based on the use
 will receive as a result of the previous step 2.1. This method is recommended for system-to-system
 communication.
 Example:
-The example is based on the TIS Testing environment URL (see Annex 1 for the different environments URL).
-Authorization type = HTTP Basic Authentication
-Populate with the Username and Password provided by GDSO
-Token duration < less 1 Day
+```jsx
+POST https://authentication-api.testing.gdso.org/getIdToken
+```
+
+The example is based on the TIS Testing environment URL (See [TIS Environnment](tis-env.md) for the different URLs).
+
+- Authorization type = HTTP Basic Authentication
+- Populate with the Username and Password provided by GDSO
+- Token duration < less 1 Day
 
 ![GetIDToken answer](/img/example_getidtoken_request.png)
+
+## 2.3 Verify the authenticity of the identification token
+For some security purpose, practice is to verify the access token with the signing key on the JWT token.
+
+To get the keys :
+
+|Testing|Production|
+|:---:|:---:|
+|[Key](https://cognito-idp.eu-central-1.amazonaws.com/eu-central-1_yIbrF9hG3/.well-known/jwks.json)|[Key](https://cognito-idp.eu-central-1.amazonaws.com/eu-central-1_X79w26IDV/.well-known/jwks.json)|
+
+If you need information : https://repost.aws/knowledge-center/decode-verify-cognito-json-token
