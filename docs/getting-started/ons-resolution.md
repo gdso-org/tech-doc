@@ -21,19 +21,19 @@ below.
 1. Capture a valid EPC/UII by scanning a tire for example. A valid UII shall follow ISO 20909/20910
 standards. According to these ISO standards, this identifier should be |SGTIN-96 format (96 bits of| data).| 
 
-*Ex|ample of |SGTIN-96 |(hexadecimal) captured by a system:*||
-**301854AAC1 3D023|119400A** |
-| | Depe|ndi |ng on the ca| ptur|e system level, EPC could be written in different ways: Raw (hexadecimal)|, Tag| |
-||URI||, || re Identity URI.|
-||| ||| A||ccordin |g to the pre| vious example, here the different EPC fo|rmat : |
-|||||||||
-|||||||||||| || |
-||||||||||||| --- | --- |
-|||||||||||||**RAW (Hexadecimal)**  |301854AAC1493D023119400A  	                        |
-|||||||||||||**Tag URI**           |urn:epc:tag:sgtin-96:0.086699.0337140.9413672970    	    |
-||||||*|*Pure Identity URI**  |urn:epc:id:sgtin:086699.0337140.9413672970 	    ||
-|||||
-|1|. |According to ONS 2.01 standard in order to query the DNS for an UII, the identifier must be converted to a GS1 Identification Key in order to convert it for ONS resolution.
+Example of SGTIN-96 (hexadecimal) captured by a system: **301854AAC1493D023119400A** 
+
+Depending on the capture system level, EPC could be written in different ways: Raw (hexadecimal), Tag URI,  Pure Identity URI.
+
+According to the previous example, here the different EPC format
+
+|||
+| --- | --- |
+|**RAW (Hexadecimal)**  |301854AAC1493D023119400A  	                        |
+|**Tag URI**           |urn:epc:tag:sgtin-96:0.086699.0337140.9413672970    |
+|**Pure Identity URI**  |urn:epc:id:sgtin:086699.0337140.9413672970 	    |
+
+2. According to ONS 2.01 standard in order to query the DNS for an UII, the identifier must be converted to a GS1 Identification Key in order to convert it for ONS resolution.
 In TIS context, GS1 Identification Key needed is GTIN (Global Trade Item Number).
 
 ![GS1Key translation](/img/gs1_key_translation.png)
@@ -47,9 +47,11 @@ Please refer to the partition value and the following table:
 
 At this stage, the **GS1 Identification Key** obtained is a GTIN: ```008669903371400```.
 
+::::info
 It exists some libraries/tools to perform the conversion:
 - [S1 EPC encoding/decoding tools](https://www.gs1.org/services/epc-encoderdecoder)
 - [EPCtagCoder by jlcout](https://github.com/jlcout/epctagcoder)
+::::
 
 ## 1.2. Transform GS1 Identification Key to a valid key for ONS (Fully Qualified Domain Name)
 
@@ -174,6 +176,8 @@ Example:
 https://indus.api.michelin.com/tid-ultimv1/gdso/
 ```
 
+::::info
 It exists some libraries/tools available to request TIS Resolver:
 - [Google DNS resolve (using HTTP request)](https://dns.google/resolve?name=%3Cvalid_key%3E&type=NAPTR)
 - [Java library with NAPTR request implementation](https://github.com/dnsjava/dnsjava)
+::::
