@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# 3.1. Introduction
+# 3.1 Introduction
 
 Although API URLs may differ from one manufacturer to another, all GDSO members involved in the Tire
 information service agreed on a standard format for:

@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# 3.2. Get data from one UII
+# 3.2 Get data from one UII
 
 Although API URLs may differ from one manufacturer to another, all GDSO members involved in the Tire
 information service agreed on a standard format for:
@@ -19,7 +19,7 @@ are aware that these additions shall not interfere with the format agreed on sta
 In this last section, we will describe how to build the request that needs to be sent to tire manufacturer’s API
 to get data.
 
-## 3.2.1. Unauthenticated request for Public data
+## 3.2.1 Unauthenticated request for Public data
 This request will return only the Public information related to a tire. User identification is not necessary in
 this case.
 
