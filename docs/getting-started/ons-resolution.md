@@ -19,7 +19,7 @@ below.
 ## 1.1 Obtain a GS1 Identification Key from UII
 
 1. Capture a valid EPC/UII by scanning a tire for example. A valid UII shall follow ISO 20909/20910
-standards. According to these ISO standards, this identifier should be |SGTIN-96 format (96 bits of| data).| 
+standards. According to these ISO standards, this identifier should follow SGTIN-96 standard (96 bits of data).
 
 Example of SGTIN-96 (hexadecimal) captured by a system: **30105E30A70457000021E88E** 
 
@@ -45,7 +45,7 @@ Please refer to the partition value and the following table:
 ![SGTIN Partition Table](/img/sgtin_partition_table.png)
 :::
 
-At this stage, the **GS1 Identification Key** obtained is a GTIN: ```01234567844445```.
+At this stage, the **GS1 Identification Key** obtained is a GTIN: ```01234567844442```.
 
 ::::info
 It exists some libraries/tools to perform the conversion:
@@ -56,39 +56,48 @@ It exists some libraries/tools to perform the conversion:
 ## 1.2. Transform GS1 Identification Key to a valid key for ONS (Fully Qualified Domain Name)
 
 In general, the format of the first valid key for ONS is:
-The first valid key as follows:
-Append a transformation of the GS1 Identification Key (GTIN obtained in the previous step 1.1) within
-the AUS.
-Strip the checksum digit, if applicable.
+
 ```jsx
-0123456784444 5 --> 0123456784444
+<transformation of the identification key>.<identification key type>.<organisation
+namespace>.id.<valid ONS Peer Root domain name>
 ```
-Hold the leading digit (in this case GTIN indicator digit) in its position
+
+The first valid key as follows:
+
+1. Append a transformation of the GS1 Identification Key (GTIN obtained in the previous step 1.1) within
+the AUS.
+
+* Strip the checksum digit, if applicable.
+```jsx
+0123456784444 2 --> 0123456784444
+```
+
+* Hold the leading digit (in this case GTIN indicator digit) in its position
 ```jsx
 0 123456784444
 ```
-Reverse all the remaining characters.
+
+* Reverse all the remaining characters.
 ```jsx
-123456784444
 0 123456784444 --> 0 444487654321
 ```
 
-For each character, append a ‘.’ (period).
+* For each character, append a ‘.’ (period).
 ```jsx
 0444487654321 --> 0.4.4.4.4.8.7.6.5.4.3.2.1
 ```
 
-Append the identification key type, in this case: “gtin“
+2. Append the identification key type, in this case: “gtin“
 ```jsx
 0.4.4.4.4.8.7.6.5.4.3.2.1.gtin
 ```
 
-Append “.gs1.id.”
+3. Append “.gs1.id.”
 ```jsx
 0.4.4.4.4.8.7.6.5.4.3.2.1.gtin.gs1.id.
 ```
 
-Append a valid ONS root domain name, in TIS case: “testing.gdso.org “
+4. Append a valid ONS root domain name, in TIS case: “testing.gdso.org “
 
 ```jsx
 0.4.4.4.4.8.7.6.5.4.3.2.1.gtin.gs1.id.testing.gdso.org
@@ -107,10 +116,6 @@ resolve this URL. You should receive the following information in answer:
 
 The most important information in this answer will be:
 
-```jsx
-<transformation of the identification key>.<identification key type>.<organisation
-namespace>.id.<valid ONS Peer Root domain name>
-```
 
 The service name (in orange in the example below) /!\ Service name format may evolve in the
 future.
@@ -141,6 +146,12 @@ Answer:
       "type": 35,
       "TTL": 60,
       "data": "0 0 u GetTireBySgtin !^.*$!https://example.com/tire/! ."
+    },
+    {
+      "name": "0.4.4.4.4.8.7.6.5.4.3.2.1.gtin.gs1.id.testing.gdso.org.",
+      "type": 35,
+      "TTL": 60,
+      "data": "0 0 u GetTireByBatch !^.*$!https://example.com/tire/! ."
     }
   ],
   "Comment": "Response from 205.251.198.161."
@@ -159,8 +170,10 @@ Answer:
 The resolution may sometimes return more than 1 service (unlike the example above).
 
 1. Then you may select the appropriate service that you will use to request data from the tire’s
-manufacturer in the following steps. The service to retrieve standard data on a tire MUST be named
-**GetTireBySgtin**
+manufacturer in the following steps. 
+
+* The service to retrieve standard data from one UII MUST be named **GetTireBySgtin**
+* The service to retrieve standard data from a list of UIIs (100 max) MUST be named **GetTireByBatch**
 
 1. Retrieve the regexp associated to the chosen service name:
 
@@ -169,7 +182,7 @@ Example:
 !^.*$! https://example.com/tire/!
 ```
 
-1. Extract the API URL from it
+3. Extract the API URL from it
 
 Example: 
 

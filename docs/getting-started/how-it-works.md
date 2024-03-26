@@ -13,7 +13,7 @@ the above process, which can be split in 3 steps:
    
 2. Authentication (optional: Only required when private data needs to be shared)
    
-3. API call to a tire manufacturer
+3. API request to a tire manufacturer database
 
 
 GDSO’s service is mainly involved in the first two steps (Resolution and Authentication). The last one is
