@@ -20,11 +20,8 @@ To illustrate this behaviour, take this list for example :
 ```
 - urn:epc:id:sgtin:12345678.04444.2222222
 - urn:epc:id:sgtin:12345678.07777.123456
-- urn:epc:id:sgtin:5414801.016955.21042200760
-- urn:epc:id:sgtin:4038526.007407.11937128959
-- urn:epc:id:sgtin:086699.0762575.63647563790
-- urn:epc:id:sgtin:086699.0860113.9423077433
-- urn:epc:id:sgtin:8019227.037886.9436887659
+- urn:epc:id:sgtin:87654321.01111.10101010
+- urn:epc:id:sgtin:87654321.02222.2468
 ```
 
 We group by Company Prefix
@@ -33,15 +30,9 @@ We group by Company Prefix
 - "12345678"
     * urn:epc:id:sgtin:12345678.04444.2222222
     * urn:epc:id:sgtin:12345678.07777.123456
-- "5414801"
-    * urn:epc:id:sgtin:5414801.016955.21042200760
-- "4038526"
-    * urn:epc:id:sgtin:4038526.007407.11937128959
-- "086699"
-    * urn:epc:id:sgtin:086699.0762575.63647563790
-    * urn:epc:id:sgtin:086699.0860113.9423077433
-- "8019227"
-    * urn:epc:id:sgtin:8019227.037886.9436887659
+- "87654321"
+    * urn:epc:id:sgtin:87654321.01111.10101010
+    * urn:epc:id:sgtin:87654321.02222.2468
 ```
 
 As described in [1. ONS Resolution](../ons-resolution.md), we request the resolver to obtain the URL of **GetTireByBatch** endpoint for each group by resolving one of the UII of each group. This URL could be used for each UII of the group.
