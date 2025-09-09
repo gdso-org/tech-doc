@@ -19,3 +19,5 @@ the above process, which can be split in 3 steps:
 GDSO’s service is mainly involved in the first two steps (Resolution and Authentication). The last one is
 managed between the customer and the appropriate tire maker.
 This document will describe in more details how to go through all steps in the sections below.
+
+REMARK: as a result of GDSO Standardisation process, in case an attribute is empty then the field tag is not returned at all.
